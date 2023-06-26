@@ -69,19 +69,47 @@ int main() {
     std::string key = "my_key";
     std::string value = "my_value";
 
-    // Écriture d'une paire clé-valeur
+    // Création d'une paire clé-valeur
     status = db->Put(rocksdb::WriteOptions(), key, value);
     if (status.ok()) {
+      std::cout << "Paire clé-valeur créée avec succès." << std::endl;
+
       // Lecture de la valeur en utilisant la clé
       std::string result;
       status = db->Get(rocksdb::ReadOptions(), key, &result);
       if (status.ok()) {
         std::cout << "Valeur de la clé : " << result << std::endl;
+
+        // Mise à jour de la valeur
+        std::string updatedValue = "new_value";
+        status = db->Put(rocksdb::WriteOptions(), key, updatedValue);
+        if (status.ok()) {
+          std::cout << "Valeur mise à jour avec succès." << std::endl;
+
+          // Lecture de la valeur mise à jour
+          std::string updatedResult;
+          status = db->Get(rocksdb::ReadOptions(), key, &updatedResult);
+          if (status.ok()) {
+            std::cout << "Valeur mise à jour de la clé : " << updatedResult << std::endl;
+
+            // Suppression de la paire clé-valeur
+            status = db->Delete(rocksdb::WriteOptions(), key);
+            if (status.ok()) {
+              std::cout << "Paire clé-valeur supprimée avec succès." << std::endl;
+            } else {
+              std::cerr << "Erreur lors de la suppression de la paire clé-valeur : " << status.ToString() << std::endl;
+            }
+          } else {
+            std::cerr << "Erreur lors de la lecture de la valeur mise à jour : " << status.ToString() << std::endl;
+          }
+        } else {
+          std::cerr << "Erreur lors de la mise à jour de la valeur : " << status.ToString() << std::endl;
+        }
       } else {
         std::cerr << "Erreur lors de la lecture de la valeur : " << status.ToString() << std::endl;
       }
     } else {
-      std::cerr << "Erreur lors de l'écriture de la paire clé-valeur : " << status.ToString() << std::endl;
+      std::cerr << "Erreur lors de la création de la paire clé-valeur : " << status.ToString() << std::endl;
     }
 
     delete db;
@@ -91,6 +119,7 @@ int main() {
 
   return 0;
 }
+
 ```
 
 Assurez-vous d'inclure les en-têtes de RocksDB et de lier votre application avec les bibliothèques de RocksDB lors de la compilation.
