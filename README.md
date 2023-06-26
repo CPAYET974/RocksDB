@@ -53,6 +53,44 @@ Cela copiera les fichiers de bibliothèque, les en-têtes et les binaires néces
 
 **5. Utilisation de RocksDB**
 
-Maintenant que vous avez installé RocksDB avec succès, vous pouvez l'utiliser dans votre projet. Assurez-vous d'inclure les en-têtes de RocksDB dans votre code source et de lier votre application avec les bibliothèques de RocksDB lors de la compilation.
+Voici un exemple simple d'utilisation de RocksDB dans votre code C++ :
 
-C'est tout ! Vous avez maintenant installé RocksDB sur votre système et vous êtes prêt à commencer à l'utiliser dans vos projets.
+```cpp
+#include <iostream>
+#include <rocksdb/db.h>
+
+int main() {
+  rocksdb::DB* db;
+  rocksdb::Options options;
+  options.create_if_missing = true;
+
+  rocksdb::Status status = rocksdb::DB::Open(options, "/path/to/db", &db);
+  if (status.ok()) {
+    std::string key = "my_key";
+    std::string value = "my_value";
+
+    // Écriture d'une paire clé-valeur
+    status = db->Put(rocksdb::WriteOptions(), key, value);
+    if (status.ok()) {
+      // Lecture de la valeur en utilisant la clé
+      std::string result;
+      status = db->Get(rocksdb::ReadOptions(), key, &result);
+      if (status.ok()) {
+        std::cout << "Valeur de la clé : " << result << std::endl;
+      } else {
+        std::cerr << "Erreur lors de la lecture de la valeur : " << status.ToString() << std::endl;
+      }
+    } else {
+      std::cerr << "Erreur lors de l'écriture de la paire clé-valeur : " << status.ToString() << std::endl;
+    }
+
+    delete db;
+  } else {
+    std::cerr << "Erreur lors de l'ouverture de la base de données : " << status.ToString() << std::endl;
+  }
+
+  return 0;
+}
+```
+
+Assurez-vous d'inclure les en-têtes de RocksDB et de lier votre application avec les bibliothèques de RocksDB lors de la compilation.
